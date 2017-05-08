@@ -70,13 +70,24 @@ class QuestionViewTests(TestCase):
             ["<Question: Past question.1>", "<Question: Past question.2>"]
         )
 
+    def test_index_view_with_choice_is_null(self):
+        create_question(question_text="question.1", days =-1)
+        response = self.client.get(reverse('polls:index'))
+        self.assertContains(response, "No polls are available.", status_code=200)
+        self.assertQuerysetEqual(response.context['latest_question_list'], [])
+
+    def test_index_view_with_choice_is_not_null(self):
+        q = create_question(question_text="question.1", days=-1)
+        create_choice(question=q,choice_text="choice.1")
+        response = self.client.get(reverse('polls:index'))
+        self.assertQuerysetEqual(response.context['latest_question_list'], ["<Question: question.1>"])
+
 class DetailViewTest(TestCase):
     def test_detail_view_with_past_question(self):
         past_question = create_question(question_text="Past question.", days=-30)
         create_choice(question=past_question, choice_text="Past question's choice")
         response = self.client.get(reverse('polls:detail', args=(past_question.id,)))
         self.assertContains(response, past_question.question_text, status_code=200)
-
 
     def test_detail_view_with_future_question(self):
         future_question = create_question(question_text="Past question.", days=5)
