@@ -18,5 +18,9 @@ class QuestionAdmin(admin.ModelAdmin):
     list_filter = ['pub_date']
     search_fields = ['question_text']
 
+class ChoiceAdmin(admin.ModelAdmin):
+    list_display = ('choice_text', 'question_id')
+
 
 admin.site.register(Question, QuestionAdmin)
+admin.site.register(Choice, ChoiceAdmin)
